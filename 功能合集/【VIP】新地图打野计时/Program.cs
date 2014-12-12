@@ -55,7 +55,7 @@ namespace JungleTimerHax
                 GetSpecInfo();
             }).Start();
 
-            (Config = new Menu("【VIP】新地图打野计时", "JungleTimers420", true)).AddToMainMenu();
+            (Config = new Menu("【初见汉化】新地图打野计时", "JungleTimers420", true)).AddToMainMenu();
             Config.AddItem(new MenuItem("TextColor", "字体颜色").SetValue(new Circle(true, Color.FromArgb(255, 255, 255, 0))));
             Config.AddItem(new MenuItem("OutlineColor", "边框颜色").SetValue(new Circle(true, Color.FromArgb(255, 0, 0, 0))));
 

@@ -16,7 +16,7 @@ namespace JunglePosition
 
         private static void Game_OnGameLoad(EventArgs args)
         {
-            Config = new Menu("|初见汉化-无伤打野点|", "JunglePosition", true);
+            Config = new Menu("【初见汉化】无伤打野点", "JunglePosition", true);
             Config.AddItem(new MenuItem("Show", "显示").SetValue(new Circle(true, Color.GreenYellow)));
             Config.AddToMainMenu();
 

@@ -142,7 +142,7 @@ namespace LeagueSharp.Common
         {
             get
             {
-                return 160;
+                return 250;
             }
         }
 
@@ -158,7 +158,7 @@ namespace LeagueSharp.Common
         {
             get
             {
-                return Color.FromArgb(200, Color.Black);
+                return Color.FromArgb(100, Color.Black);
             }
         }
 
@@ -166,7 +166,7 @@ namespace LeagueSharp.Common
         {
             get
             {
-                return Color.DimGray;
+                return Color.Firebrick;
             }
         }
 
@@ -196,8 +196,8 @@ namespace LeagueSharp.Common
                 Drawing.Direct3DDevice,
                 new FontDescription
                 {
-                    FaceName = "Tahoma",
-                    Height = 14,
+                    FaceName = "微软雅黑",
+                    Height = 22,
                     OutputPrecision = FontPrecision.Default,
                     Quality = FontQuality.Antialiased,
                     //Weight = FontWeight.Bold,
@@ -250,9 +250,9 @@ namespace LeagueSharp.Common
         internal static void DrawOnOff(bool on, Vector2 position, MenuItem item)
         {
             DrawBox(
-                position, item.Height, item.Height, on ? Color.Green : Color.Red, 1,
+                position, item.Height, item.Height, on ? Color.ForestGreen : Color.Firebrick, 1,
                 Color.Black);
-            var s = on ? "On" : "Off";
+            var s = on ? "开" : "关";
             Font.DrawText(null, s, new SharpDX.Rectangle((int)(item.Position.X + item.Width - item.Height), (int)item.Position.Y, item.Height, item.Height), FontDrawFlags.VerticalCenter | FontDrawFlags.Center, new ColorBGRA(255, 255, 255, 255));
         }
 

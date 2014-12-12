@@ -2009,6 +2009,7 @@ namespace LeagueSharp.Common
             /// <summary>
             ///     Gets received when a unit starts, aborts or finishes recalling.
             /// </summary>
+            [Obsolete("Use Packet.S2C.Teleport class instead.")]
             public static class Recall
             {
                 public enum ObjectType
@@ -2200,6 +2201,200 @@ namespace LeagueSharp.Common
                     Recall,
                     Teleport,
                     Unknown
+                }
+            }
+
+            #endregion
+
+            #region Teleport
+
+            /// <summary>
+            ///     Gets received when a unit starts, aborts or finishes a teleport (such as recall, teleport, twisted fate ulti, shen
+            ///     ulti,...)
+            /// </summary>
+            public static class Teleport
+            {
+                public enum Status
+                {
+                    Start,
+                    Abort,
+                    Finish,
+                    Unknown
+                }
+
+                public enum Type
+                {
+                    Recall,
+                    Teleport,
+                    TwistedFate,
+                    Shen,
+                    Unknown
+                }
+
+                internal interface ITeleport
+                {
+                    Type Type { get; }
+                    int GetDuration(byte[] packetData);
+                }
+
+                internal class RecallTeleport : ITeleport
+                {
+                    public Type Type
+                    {
+                        get { return Type.Recall; }
+                    }
+
+                    public int GetDuration(byte[] packetData)
+                    {
+                        var p = new GamePacket(packetData);
+                        return Utility.GetRecallTime(p.ReadString(139));
+                    }
+                }
+
+                internal class TeleportTeleport : ITeleport
+                {
+                    public Type Type
+                    {
+                        get { return Type.Teleport; }
+                    }
+
+                    public int GetDuration(byte[] packetData)
+                    {
+                        return 3500;
+                    }
+                }
+
+                internal class TwistedFateTeleport : ITeleport
+                {
+                    public Type Type
+                    {
+                        get { return Type.TwistedFate; }
+                    }
+
+                    public int GetDuration(byte[] packetData)
+                    {
+                        return 1500;
+                    }
+                }
+
+                internal class ShenTeleport : ITeleport
+                {
+                    public Type Type
+                    {
+                        get { return Type.TwistedFate; }
+                    }
+
+                    public int GetDuration(byte[] packetData)
+                    {
+                        return 3000;
+                    }
+                }
+
+
+                public static byte Header = 0xD8;
+
+                private const int ErrorGap = 100; //in ticks
+
+                private static readonly IDictionary<string, ITeleport> TypeByString = new Dictionary<string, ITeleport>
+                {
+                    {"Recall", new RecallTeleport()},
+                    {"Teleport", new TeleportTeleport()},
+                    {"Gate", new TwistedFateTeleport()},
+                    {"Shen", new ShenTeleport()},
+                };
+
+                private static readonly IDictionary<int, TeleportData> RecallDataByNetworkId =
+                    new Dictionary<int, TeleportData>();
+
+                public static GamePacket Encoded(Struct packetStruct)
+                {
+                    //TODO when the packet is fully decoded.
+                    return new GamePacket(Header);
+                }
+
+                public static Struct Decoded(byte[] data)
+                {
+                    var packet = new GamePacket(data);
+                    var result = new Struct
+                    {
+                        UnitNetworkId = packet.ReadInteger(5),
+                        Status = Status.Unknown,
+                        Type = Type.Unknown
+                    };
+
+                    string typeAsString = packet.ReadString(75);
+                    var gameObject = ObjectManager.GetUnitByNetworkId<GameObject>(result.UnitNetworkId);
+
+                    if (gameObject == null)
+                    {
+                        return result;
+                    }
+
+                    var hero = gameObject as Obj_AI_Hero;
+                    if (hero == null || !hero.IsValid)
+                    {
+                        return result;
+                    }
+
+                    if (!RecallDataByNetworkId.ContainsKey(result.UnitNetworkId))
+                    {
+                        RecallDataByNetworkId[result.UnitNetworkId] = new TeleportData {Type = Type.Unknown};
+                    }
+
+
+                    if (!string.IsNullOrEmpty(typeAsString))
+                    {
+                        if (TypeByString.ContainsKey(typeAsString))
+                        {
+                            ITeleport teleportMethod = TypeByString[typeAsString];
+
+                            int duration = teleportMethod.GetDuration(data);
+                            Type type = teleportMethod.Type;
+
+                            RecallDataByNetworkId[result.UnitNetworkId] = new TeleportData
+                            {
+                                Duration = duration,
+                                Type = type,
+                                Start = Environment.TickCount
+                            };
+
+                            result.Status = Status.Start;
+                            result.Duration = duration;
+                            result.Type = type;
+                        }
+                    }
+                    else
+                    {
+                        bool shorter = Environment.TickCount - RecallDataByNetworkId[result.UnitNetworkId].Start <
+                                       RecallDataByNetworkId[result.UnitNetworkId].Duration - ErrorGap;
+                        result.Status = shorter ? Status.Abort : Status.Finish;
+                        result.Type = RecallDataByNetworkId[result.UnitNetworkId].Type;
+                        result.Duration = 0;
+                    }
+                    return result;
+                }
+
+                internal struct TeleportData
+                {
+                    public Type Type { get; set; }
+                    public int Start { get; set; }
+                    public int Duration { get; set; }
+                }
+
+                public struct Struct
+                {
+                    public int Duration;
+                    public Status Status;
+                    public Type Type;
+                    public int UnitNetworkId;
+
+                    public Struct(int unitNetworkId, Status status, Type type, int duration)
+                    {
+                        UnitNetworkId = unitNetworkId;
+                        Status = status;
+                        Type = type;
+                        Duration = duration;
+                    }
                 }
             }
 
@@ -2969,6 +3164,78 @@ namespace LeagueSharp.Common
                     public int NetworkId;
                     public int PointsLeft;
                     public Obj_AI_Hero Unit;
+                }
+            }
+
+            #endregion
+
+            #region Surrender
+
+            /// <summary>
+            ///     Received when someone casts a surrender vote.
+            /// </summary>
+            public class Surrender
+            {
+                public static byte Header = 0xC9;
+
+                public static Struct Decoded(byte[] data)
+                {
+                    var packet = new GamePacket(data);
+                    var result = new Struct
+                    {
+                        NetworkId = packet.ReadInteger(6),
+                        YesVotes = packet.ReadByte(10),
+                        NoVotes = packet.ReadByte(11),
+                        MaxVotes = packet.ReadByte(12),
+                        Team = (GameObjectTeam) packet.ReadByte(13)
+                    };
+
+                    //byte unknown = packet.ReadByte(5); //Not sure what this is
+
+                    return result;
+                }
+
+                public struct Struct
+                {
+                    public int NetworkId;
+                    public int YesVotes;
+                    public int NoVotes;
+                    public int MaxVotes;
+                    public GameObjectTeam Team;
+                }
+            }
+
+            #endregion
+
+            #region SurrenderResult
+
+            /// <summary>
+            ///     Received when surrender voting is over.
+            /// </summary>
+            public class SurrenderResult
+            {
+                public static byte Header = 0xA5;
+
+                public static Struct Decoded(byte[] data)
+                {
+                    var packet = new GamePacket(data);
+                    var result = new Struct
+                    {
+                        TooEarly = Convert.ToBoolean(packet.ReadByte(5)),
+                        YesVotes = packet.ReadByte(9),
+                        NoVotes = packet.ReadByte(10),
+                        Team = (GameObjectTeam) packet.ReadByte(11)
+                    };
+
+                    return result;
+                }
+
+                public struct Struct
+                {
+                    public bool TooEarly;
+                    public int YesVotes;
+                    public int NoVotes;
+                    public GameObjectTeam Team;
                 }
             }
 

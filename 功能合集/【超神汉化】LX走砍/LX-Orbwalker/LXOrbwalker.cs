@@ -66,8 +66,8 @@ namespace LX_Orbwalker
 			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_AARange", "平A范围").SetValue(new Circle(true, Color.FloralWhite)));
 			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_AARange_Enemy", "敌人平A范围").SetValue(new Circle(true, Color.Pink)));
 			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_Holdzone", "控制区域").SetValue(new Circle(true, Color.FloralWhite)));
-			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_MinionHPBar", "小兵血格|").SetValue(new Circle(true, Color.Black)));
-			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_MinionHPBar_thickness", "血格密度|").SetValue(new Slider(1, 1, 3)));
+			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_MinionHPBar", "小兵血格").SetValue(new Circle(true, Color.Black)));
+			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_MinionHPBar_thickness", "血格密度").SetValue(new Slider(1, 1, 3)));
 			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_hitbox", "显示打击").SetValue(new Circle(true, Color.FloralWhite)));
 			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_Lasthit", "显示补兵").SetValue(new Circle(true, Color.Lime)));
 			menuDrawing.AddItem(new MenuItem("lxOrbwalker_Draw_nearKill", "附近可补小兵").SetValue(new Circle(true, Color.Gold)));
@@ -110,7 +110,7 @@ namespace LX_Orbwalker
 				modeLaneClear.AddItem(new MenuItem("LaneClear_attack", "攻击").SetValue(true));
 				menuModes.AddSubMenu(modeLaneClear);
 			
-				var modeLaneFreeze = new Menu("控线", "lxOrbwalker_Modes_LaneFreeze");
+				var modeLaneFreeze = new Menu("混合", "lxOrbwalker_Modes_LaneFreeze");
 				modeLaneFreeze.AddItem(new MenuItem("LaneFreeze_Key", "热键").SetValue(new KeyBind("Z".ToCharArray()[0], KeyBindType.Press)));		
 				modeLaneFreeze.AddItem(new MenuItem("LaneFreeze_move", "移动").SetValue(true));
 				modeLaneFreeze.AddItem(new MenuItem("LaneFreeze_attack", "攻击").SetValue(true));
@@ -127,7 +127,9 @@ namespace LX_Orbwalker
 				menuModes.AddSubMenu(modeFlee);
 			}
 			menu.AddSubMenu(menuModes);
-			menu.AddItem(new MenuItem("lx_info", "Created by Lexxes"));
+			menu.AddItem(new MenuItem("lx_info", "作者:Lexxes"));
+			menu.AddItem(new MenuItem("lx_info2", "汉化:超神"));
+			menu.AddItem(new MenuItem("lx_info3", "QQ群:386289593"));
 
 			Drawing.OnDraw += OnDraw;
 			Game.OnGameUpdate += OnUpdate;
