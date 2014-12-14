@@ -379,7 +379,7 @@ namespace MasterActivator
 
                                 foreach (Obj_AI_Hero hero in activeAllyHeros)
                                 {
-                                    int enemyInRange = Utility.CountEnemysInRange(700, hero);
+                                    int enemyInRange = Utility.CountEnemysInRange(hero, 700);
                                     if (enemyInRange >= 1)
                                     {
                                         int actualHeroHpPercent = (int)((hero.Health / hero.MaxHealth) * 100);
@@ -420,7 +420,7 @@ namespace MasterActivator
                                         }
                                         else if (item.type == ItemTypeId.Deffensive)
                                         {
-                                            int enemyInRange = Utility.CountEnemysInRange(700, hero);
+                                            int enemyInRange = Utility.CountEnemysInRange(hero, 700);
                                             if (enemyInRange >= 1)
                                             {
                                                 int usePercent = Config.Item(item.menuVariable + "UseOnPercent").GetValue<Slider>().Value;
