@@ -75,15 +75,15 @@ namespace Oracle
 
         public static void Game_OnGameUpdate(EventArgs args)
         {
-            UseItem("Mikaels", 3222, 600f, false);
+            UseItem("坩埚", 3222, 600f, false);
 
             if (!OC.Origin.Item("ComboKey").GetValue<KeyBind>().Active &&
                 mainmenu.Item("cleanseMode").GetValue<StringList>().SelectedIndex == 1)
                 return;
 
-            UseItem("Quicksilver", 3140);
-            UseItem("Mercurial", 3139);
-            UseItem("Dervish", 3137);
+            UseItem("水银饰带", 3140);
+            UseItem("水银弯刀", 3139);
+            UseItem("苦行僧之刃", 3137);
 
         }
 

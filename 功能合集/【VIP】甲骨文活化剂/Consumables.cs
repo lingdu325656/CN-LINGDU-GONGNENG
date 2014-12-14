@@ -15,8 +15,7 @@ namespace Oracle
             Game.OnGameUpdate += Game_OnGameUpdate;
 
             mainmenu = new Menu("消耗品", "imenu");
-
-            CreateMenuItem("蓝药", "Mana", 40, 0);
+			CreateMenuItem("蓝药", "Mana", 40, 0);
             CreateMenuItem("饼干", "Biscuit", 40, 25, true, true);
             CreateMenuItem("红药", "Health", 40, 25, false, true);
             CreateMenuItem("水晶瓶", "Flask", 40, 35, true, true);

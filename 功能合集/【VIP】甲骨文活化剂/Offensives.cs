@@ -60,23 +60,23 @@ namespace Oracle
                 if (OC.Origin.Item("ComboKey").GetValue<KeyBind>().Active)
                 {
                     if (Game.MapId == GameMapId.HowlingAbyss)
-                        UseItem("Guardians", 2051, 450f);
+                        UseItem("守护者的号角", 2051, 450f);
 
                     if (Game.MapId == GameMapId.CrystalScar || Game.MapId == GameMapId.HowlingAbyss)
-                        UseItem("Entropy", 3184, 450f, true);
+                        UseItem("冰霜战锤", 3184, 450f, true);
 
                     if (Game.MapId == GameMapId.CrystalScar || Game.MapId == GameMapId.TwistedTreeline)
-                        UseItem("Torch", 3188, 750f, true);
+                        UseItem("黯炎火炬", 3188, 750f, true);
 
-                    UseItem("Frostclaim", 3092, 850f, true);
-                    UseItem("Youmuus", 3142, 650f);
-                    UseItem("Hydra", 3077, 250f);
-                    UseItem("Hydra", 3074, 250f);
-                    UseItem("Hextech", 3146, 700f, true);
-                    UseItem("Cutlass", 3144, 450f, true);
-                    UseItem("Botrk", 3153, 450f, true);
-                    UseItem("Divine", 3131, 650f);
-                    UseItem("DFG", 3128, 750f, true);
+                    UseItem("冰霜女皇的旨令", 3092, 850f, true);
+                    UseItem("幽梦", 3142, 650f);
+                    UseItem("提亚马特/九头蛇", 3077, 250f);
+                    UseItem("提亚马特/九头蛇", 3074, 250f);
+                    UseItem("科技枪", 3146, 700f, true);
+                    UseItem("小弯刀", 3144, 450f, true);
+                    UseItem("破败", 3153, 450f, true);
+                    UseItem("神圣之剑", 3131, 650f);
+                    UseItem("冥火", 3128, 750f, true);
                 }
             }
 

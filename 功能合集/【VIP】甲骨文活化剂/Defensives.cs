@@ -133,17 +133,17 @@ namespace Oracle
             if (OC.IncomeDamage < 1) 
                 return;
 
-            UseItem("Locket", 3190, 600f, OC.IncomeDamage);
-            UseItem("Seraphs", 3040, 450f, OC.IncomeDamage, true);
-            UseItem("Zhonyas", 3157, 450f, OC.IncomeDamage, true);
-            UseItem("Randuins", 3143, 450f, OC.IncomeDamage);
-            UseItem("Mountain", 3401, 700f, OC.IncomeDamage, false, true);
+            UseItem("鸟盾", 3190, 600f, OC.IncomeDamage);
+            UseItem("大天使", 3040, 450f, OC.IncomeDamage, true);
+            UseItem("中亚", 3157, 450f, OC.IncomeDamage, true);
+            UseItem("兰顿", 3143, 450f, OC.IncomeDamage);
+            UseItem("山岳之容", 3401, 700f, OC.IncomeDamage, false, true);
 
             if (Game.MapId != GameMapId.CrystalScar)
                 return;
 
-            UseItem("Odyns", 3180, 450f, OC.IncomeDamage);
-            UseItem("Wooglets", 3090, 450f, OC.IncomeDamage, true);
+            UseItem("奥戴恩的面纱", 3180, 450f, OC.IncomeDamage);
+            UseItem("沃格勒特的巫师帽", 3090, 450f, OC.IncomeDamage, true);
         }
 
         private static void UseItem(string name, int itemId, float itemRange, float incdmg = 0, bool selfuse = false, bool targeted = false)
