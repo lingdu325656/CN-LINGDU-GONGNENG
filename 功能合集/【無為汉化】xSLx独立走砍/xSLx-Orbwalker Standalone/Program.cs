@@ -31,7 +31,7 @@ namespace xSLx_Orbwalker_Standalone
 
             //xSLxActivator Load part
             var targetselectormenu = new Menu("目标选择器", "Common_TargetSelector");
-            SimpleTs.AddToMenu(targetselectormenu);
+            TargetSelector.AddToMenu(targetselectormenu);
             menu.AddSubMenu(targetselectormenu);
         }
     }

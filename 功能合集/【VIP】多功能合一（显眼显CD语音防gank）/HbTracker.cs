@@ -221,7 +221,7 @@ namespace Tracker
                     var k = 0;
                     foreach (var sSlot in SummonerSpellSlots)
                     {
-                        var spell = hero.SummonerSpellbook.GetSpell(sSlot);
+                        var spell = hero.Spellbook.GetSpell(sSlot);
                         var texture = SummonerTextures.ContainsKey(spell.Name)
                             ? SummonerTextures[spell.Name]
                             : SummonerTextures["SummonerBarrier"];
