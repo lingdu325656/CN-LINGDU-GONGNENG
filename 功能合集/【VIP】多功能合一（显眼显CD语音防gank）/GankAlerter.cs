@@ -83,7 +83,7 @@ namespace Tracker
                     if (!hero.IsValid)
                         continue;
                     bool hasSmite = false;
-                    foreach (SpellDataInst spell in hero.SummonerSpellbook.Spells)
+                    foreach (SpellDataInst spell in hero.Spellbook.Spells)
                     {
                         if (spell.Name.ToLower().Contains("smite"))
                         {

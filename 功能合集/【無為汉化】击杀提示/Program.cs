@@ -43,7 +43,7 @@ namespace Killability
 
         public KillDrawer()
         {
-            _ignite = ObjectManager.Player.SummonerSpellbook.Spells.FirstOrDefault(x => x.Name.ToLower() == "summonerdot");
+            _ignite = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(x => x.Name.ToLower() == "summonerdot");
             _spells = new List<Spell>();
             _items = new List<Items.Item>
             {

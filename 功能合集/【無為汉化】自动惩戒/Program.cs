@@ -61,7 +61,7 @@ namespace meta_Smite
                     double smitedamage = smiteDamage();
                     double spelldamage = spellDamage(mob);
 
-                    if (ObjectManager.Player.SummonerSpellbook.CanUseSpell(smiteSlot) == SpellState.Ready && Vector3.Distance(ObjectManager.Player.ServerPosition, mob.ServerPosition) < smite.Range)
+                    if (ObjectManager.Player.Spellbook.CanUseSpell(smiteSlot) == SpellState.Ready && Vector3.Distance(ObjectManager.Player.ServerPosition, mob.ServerPosition) < smite.Range)
                     {
                         smiteReady = true;
                     }
@@ -69,7 +69,7 @@ namespace meta_Smite
                     if (smiteReady && mob.Health < smitedamage) //Smite is ready and enemy is killable with smite
                     {
                         setSmiteSlot();
-                        ObjectManager.Player.SummonerSpellbook.CastSpell(smiteSlot, mob);
+                        ObjectManager.Player.Spellbook.CastSpell(smiteSlot, mob);
                     }
 
                     if (!hasSpell) 
@@ -178,7 +178,7 @@ namespace meta_Smite
             {
                 bool smiteR = false;
                 bool spellR = false;
-                if (ObjectManager.Player.SummonerSpellbook.CanUseSpell(smiteSlot) == SpellState.Ready)
+                if (ObjectManager.Player.Spellbook.CanUseSpell(smiteSlot) == SpellState.Ready)
                 {
                     smiteR = true;
                 }
@@ -344,7 +344,7 @@ namespace meta_Smite
 
         public static void setSmiteSlot()
         {
-            foreach (var spell in ObjectManager.Player.SummonerSpellbook.Spells.Where(spell => String.Equals(spell.Name, smitetype(), StringComparison.CurrentCultureIgnoreCase)))
+            foreach (var spell in ObjectManager.Player.Spellbook.Spells.Where(spell => String.Equals(spell.Name, smitetype(), StringComparison.CurrentCultureIgnoreCase)))
             {
                 smiteSlot = spell.Slot;
                 smite = new Spell(smiteSlot, 700);
