@@ -1,7 +1,7 @@
 ﻿#region LICENSE
 /*
  Copyright 2014 - 2014 LeagueSharp
- Orbwalking.cs is part of LeagueSharp.Common.
+ Geometry.cs is part of LeagueSharp.Common.
  
  LeagueSharp.Common is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -44,6 +44,14 @@ namespace LeagueSharp.Common
         public static float Distance(this Obj_AI_Base unit, Obj_AI_Base anotherUnit, bool squared = false)
         {
             return unit.ServerPosition.To2D().Distance(anotherUnit.ServerPosition.To2D(), squared);
+        }
+
+        /// <summary>
+        ///     Calculates the 2D distance to the unit.
+        /// </summary>
+        public static float Distance(this Obj_AI_Base unit, AttackableUnit anotherUnit, bool squared = false)
+        {
+            return unit.ServerPosition.To2D().Distance(anotherUnit.Position.To2D(), squared);
         }
 
         /// <summary>

@@ -114,11 +114,11 @@ namespace LeagueSharp.Common
             {
                 if (target != null)
                 {
-                    slot.UseItem(target);
+                    ObjectManager.Player.Spellbook.CastSpell(slot.SpellSlot, target);
                 }
                 else
                 {
-                    slot.UseItem();
+                    ObjectManager.Player.Spellbook.CastSpell(slot.SpellSlot);
                 }
             }
         }
@@ -132,11 +132,11 @@ namespace LeagueSharp.Common
             {
                 if (target != null)
                 {
-                    slot.UseItem(target);
+                    ObjectManager.Player.Spellbook.CastSpell(slot.SpellSlot, target);
                 }
                 else
                 {
-                    slot.UseItem();
+                    ObjectManager.Player.Spellbook.CastSpell(slot.SpellSlot);
                 }
             }
         }
@@ -148,9 +148,10 @@ namespace LeagueSharp.Common
         {
             foreach (var slot in
                 ObjectManager.Player.InventoryItems.Where(slot => slot.Id == (ItemId) id)
-                    .Where(slot => position != null))
+                    .Where(slot => position != Vector2.Zero))
             {
-                slot.UseItem(position.To3D());
+
+                ObjectManager.Player.Spellbook.CastSpell(slot.SpellSlot, position.To3D());
             }
         }
 
@@ -161,9 +162,9 @@ namespace LeagueSharp.Common
         {
             foreach (var slot in
                 ObjectManager.Player.InventoryItems.Where(slot => slot.Id == (ItemId) id)
-                    .Where(slot => position != null))
+                    .Where(slot => position != Vector3.Zero))
             {
-                slot.UseItem(position);
+                ObjectManager.Player.Spellbook.CastSpell(slot.SpellSlot, position);
             }
         }
 

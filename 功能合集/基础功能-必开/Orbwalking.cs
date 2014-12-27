@@ -36,15 +36,15 @@ namespace LeagueSharp.Common
     /// </summary>
     public static class Orbwalking
     {
-        public delegate void AfterAttackEvenH(Obj_AI_Base unit, Obj_AI_Base target);
+        public delegate void AfterAttackEvenH(AttackableUnit unit, AttackableUnit target);
 
         public delegate void BeforeAttackEvenH(BeforeAttackEventArgs args);
 
-        public delegate void OnAttackEvenH(Obj_AI_Base unit, Obj_AI_Base target);
+        public delegate void OnAttackEvenH(AttackableUnit unit, AttackableUnit target);
 
-        public delegate void OnNonKillableMinionH(Obj_AI_Base minion);
+        public delegate void OnNonKillableMinionH(AttackableUnit minion);
 
-        public delegate void OnTargetChangeH(Obj_AI_Base oldTarget, Obj_AI_Base newTarget);
+        public delegate void OnTargetChangeH(AttackableUnit oldTarget, AttackableUnit newTarget);
 
         public enum OrbwalkingMode
         {
@@ -90,7 +90,7 @@ namespace LeagueSharp.Common
         public static bool Move = true;
         public static int LastMoveCommandT = 0;
         public static Vector3 LastMoveCommandPosition = Vector3.Zero;
-        private static Obj_AI_Base _lastTarget;
+        private static AttackableUnit _lastTarget;
         private static readonly Obj_AI_Hero Player;
         private static int _delay = 80;
         private static float _minDistance = 400;
@@ -101,7 +101,7 @@ namespace LeagueSharp.Common
             Player = ObjectManager.Player;
             Obj_AI_Base.OnProcessSpellCast += OnProcessSpell;
             GameObject.OnCreate += Obj_SpellMissile_OnCreate;
-            Game.OnGameProcessPacket += OnProcessPacket;
+            Obj_AI_Hero.OnInstantStopAttack += ObjAiHeroOnOnInstantStopAttack;
         }
 
         private static void Obj_SpellMissile_OnCreate(GameObject sender, EventArgs args)
@@ -141,7 +141,7 @@ namespace LeagueSharp.Common
         //  </summary>
         public static event OnNonKillableMinionH OnNonKillableMinion;
 
-        private static void FireBeforeAttack(Obj_AI_Base target)
+        private static void FireBeforeAttack(AttackableUnit target)
         {
             if (BeforeAttack != null)
             {
@@ -153,7 +153,7 @@ namespace LeagueSharp.Common
             }
         }
 
-        private static void FireOnAttack(Obj_AI_Base unit, Obj_AI_Base target)
+        private static void FireOnAttack(AttackableUnit unit, AttackableUnit target)
         {
             if (OnAttack != null)
             {
@@ -161,7 +161,7 @@ namespace LeagueSharp.Common
             }
         }
 
-        private static void FireAfterAttack(Obj_AI_Base unit, Obj_AI_Base target)
+        private static void FireAfterAttack(AttackableUnit unit, AttackableUnit target)
         {
             if (AfterAttack != null)
             {
@@ -169,7 +169,7 @@ namespace LeagueSharp.Common
             }
         }
 
-        private static void FireOnTargetSwitch(Obj_AI_Base newTarget)
+        private static void FireOnTargetSwitch(AttackableUnit newTarget)
         {
             if (OnTargetChange != null && (!_lastTarget.IsValidTarget() || _lastTarget != newTarget))
             {
@@ -177,7 +177,7 @@ namespace LeagueSharp.Common
             }
         }
 
-        private static void FireOnNonKillableMinion(Obj_AI_Base minion)
+        private static void FireOnNonKillableMinion(AttackableUnit minion)
         {
             if (OnNonKillableMinion != null)
             {
@@ -213,7 +213,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Returns the auto-attack range.
         /// </summary>
-        public static float GetRealAutoAttackRange(Obj_AI_Base target)
+        public static float GetRealAutoAttackRange(this AttackableUnit target)
         {
             var result = Player.AttackRange + Player.BoundingRadius;
             if (target.IsValidTarget())
@@ -226,14 +226,17 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Returns true if the target is in auto-attack range.
         /// </summary>
-        public static bool InAutoAttackRange(Obj_AI_Base target)
+        public static bool InAutoAttackRange(AttackableUnit target)
         {
             if (!target.IsValidTarget())
             {
                 return false;
             }
             var myRange = GetRealAutoAttackRange(target);
-            return Vector2.DistanceSquared(target.ServerPosition.To2D(), Player.Position.To2D()) <= myRange * myRange;
+            return
+                Vector2.DistanceSquared(
+                    (target is Obj_AI_Base) ? ((Obj_AI_Base)target).ServerPosition.To2D() : target.Position.To2D(),
+                    Player.ServerPosition.To2D()) <= myRange * myRange;
         }
 
         /// <summary>
@@ -317,17 +320,17 @@ namespace LeagueSharp.Common
             var point = position;
             if (useFixedDistance)
             {
-                point = position +
+                point = Player.ServerPosition +
                         (randomizeMinDistance
-                            ? _random.NextFloat(_minDistance * 0.8f, _minDistance * 1.2f)
+                            ? (_random.NextFloat(0.6f, 1) + 0.2f) * _minDistance
                             : _minDistance) * (position.To2D() - Player.ServerPosition.To2D()).Normalized().To3D();
             }
             else
             {
                 if (randomizeMinDistance)
                 {
-                    point = position +
-                            _random.NextFloat(_minDistance * 0.8f, _minDistance * 1.2f) *
+                    point = Player.ServerPosition +
+                            (_random.NextFloat(0.6f, 1) + 0.2f) * _minDistance *
                             (position.To2D() - Player.ServerPosition.To2D()).Normalized().To3D();
                 }
                 else if (Player.ServerPosition.Distance(position) > _minDistance)
@@ -344,7 +347,7 @@ namespace LeagueSharp.Common
         /// <summary>
         ///     Orbwalk a target while moving to Position.
         /// </summary>
-        public static void Orbwalk(Obj_AI_Base target,
+        public static void Orbwalk(AttackableUnit target,
             Vector3 position,
             float extraWindup = 90,
             float holdAreaRadius = 0,
@@ -391,54 +394,61 @@ namespace LeagueSharp.Common
             LastAATick = 0;
         }
 
-        private static void OnProcessPacket(GamePacketEventArgs args)
+        private static void ObjAiHeroOnOnInstantStopAttack(Obj_AI_Base sender, GameObjectInstantStopAttackEventArgs args)
         {
-            if (args.PacketData[0] != 0x34 || new GamePacket(args).ReadInteger(1) != ObjectManager.Player.NetworkId ||
-                (args.PacketData[5] != 0x11 && args.PacketData[5] != 0x91))
+            if (sender.IsValid && sender.IsMe && !new byte[] { 33, 97, 1, 225, 161, 0 }.Contains(args.BitData))
             {
-                return;
+                ResetAutoAttackTimer();
             }
-
-            ResetAutoAttackTimer();
         }
+
 
         private static void OnProcessSpell(Obj_AI_Base unit, GameObjectProcessSpellCastEventArgs Spell)
         {
-            var spellName = Spell.SData.Name;
-            var target = Spell.Target as Obj_AI_Base;
-
-            if (IsAutoAttackReset(spellName) && unit.IsMe)
+            try
             {
-                Utility.DelayAction.Add(250, ResetAutoAttackTimer);
-            }
+                var spellName = Spell.SData.Name;
 
-            if (!IsAutoAttack(spellName))
-            {
-                return;
-            }
-
-            if (unit.IsMe)
-            {
-                LastAATick = Environment.TickCount - Game.Ping / 2;
-                if (target != null && target.IsValid)
+                if (IsAutoAttackReset(spellName) && unit.IsMe)
                 {
-                    FireOnTargetSwitch(target);
-                    _lastTarget = target;
+                    Utility.DelayAction.Add(250, ResetAutoAttackTimer);
                 }
 
-                if (unit.IsMelee())
+                if (!IsAutoAttack(spellName))
                 {
-                    Utility.DelayAction.Add(
-                        (int) (unit.AttackCastDelay * 1000 + 40), () => FireAfterAttack(unit, _lastTarget));
+                    return;
                 }
-            }
 
-            FireOnAttack(unit, _lastTarget);
+                if (unit.IsMe && Spell.Target is Obj_AI_Base)
+                {
+                    LastAATick = Environment.TickCount - Game.Ping / 2;
+                    var target = (Obj_AI_Base)Spell.Target;
+                    if (target.IsValid)
+                    {
+                        FireOnTargetSwitch(target);
+                        _lastTarget = target;
+                    }
+
+                    if (unit.IsMelee())
+                    {
+                        Utility.DelayAction.Add(
+                            (int)(unit.AttackCastDelay * 1000 + 40), () => FireAfterAttack(unit, _lastTarget));
+                    }
+                }
+
+                FireOnAttack(unit, _lastTarget);
+
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
+            
         }
 
         public class BeforeAttackEventArgs
         {
-            public Obj_AI_Base Target;
+            public AttackableUnit Target;
             public Obj_AI_Base Unit = ObjectManager.Player;
             private bool _process = true;
 
@@ -604,15 +614,15 @@ namespace LeagueSharp.Common
                                 Player.GetAutoAttackDamage(minion));
             }
 
-            public Obj_AI_Base GetTarget()
+            public AttackableUnit GetTarget()
             {
-                Obj_AI_Base result = null;
+                AttackableUnit result = null;
                 var r = float.MaxValue;
 
                 if ((ActiveMode == OrbwalkingMode.Mixed || ActiveMode == OrbwalkingMode.LaneClear) &&
                     !_config.Item("PriorizeFarm").GetValue<bool>())
                 {
-                    var target = SimpleTs.GetTarget(-1, SimpleTs.DamageType.Physical);
+                    var target = TargetSelector.GetTarget(-1, TargetSelector.DamageType.Physical);
                     if (target != null)
                     {
                         return target;
@@ -661,7 +671,7 @@ namespace LeagueSharp.Common
                 /*Champions*/
                 if (ActiveMode != OrbwalkingMode.LastHit)
                 {
-                    var target = SimpleTs.GetTarget(-1, SimpleTs.DamageType.Physical);
+                    var target = TargetSelector.GetTarget(-1, TargetSelector.DamageType.Physical);
                     if (target.IsValidTarget())
                     {
                         return target;
@@ -683,9 +693,36 @@ namespace LeagueSharp.Common
                     }
                 }
 
-                if (result.IsValidTarget())
+                /*turrets*/
+                if (ActiveMode != OrbwalkingMode.LaneClear)
                 {
-                    return result;
+                    foreach (var turret in
+                        ObjectManager.Get<Obj_AI_Turret>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                    {
+                        return turret;
+                    }
+                }
+
+                /*inhibitor*/
+                if (ActiveMode != OrbwalkingMode.LaneClear)
+                {
+                    foreach (var turret in
+                        ObjectManager.Get<Obj_BarracksDampener>()
+                            .Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                    {
+                        return turret;
+                    }
+                }
+
+                /*nexus*/
+                if (ActiveMode != OrbwalkingMode.LaneClear)
+                {
+                    foreach (var nexus in
+                        ObjectManager.Get<Obj_HQ>()
+                            .Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
+                    {
+                        return nexus;
+                    }
                 }
 
                 /*Lane Clear minions*/
@@ -725,37 +762,34 @@ namespace LeagueSharp.Common
                     }
                 }
 
-                /*turrets*/
-                if (ActiveMode == OrbwalkingMode.LaneClear)
-                {
-                    foreach (var turret in
-                        ObjectManager.Get<Obj_AI_Turret>().Where(t => t.IsValidTarget() && InAutoAttackRange(t)))
-                    {
-                        return turret;
-                    }
-                }
-
                 return result;
             }
 
             private void GameOnOnGameUpdate(EventArgs args)
             {
-                if (ActiveMode == OrbwalkingMode.None)
+                try
                 {
-                    return;
-                }
+                    if (ActiveMode == OrbwalkingMode.None)
+                    {
+                        return;
+                    }
 
-                //Prevent canceling important channeled spells like Miss Fortunes R.
-                if (Player.IsChannelingImportantSpell())
+                    //Prevent canceling important channeled spells like Miss Fortunes R.
+                    if (Player.IsChannelingImportantSpell())
+                    {
+                        return;
+                    }
+
+                    var target = GetTarget();
+                    Orbwalk(target
+                        , (_orbwalkingPoint.To2D().IsValid()) ? _orbwalkingPoint : Game.CursorPos,
+                        _config.Item("ExtraWindup").GetValue<Slider>().Value,
+                        _config.Item("HoldPosRadius").GetValue<Slider>().Value);
+                }
+                catch (Exception e)
                 {
-                    return;
+                    Console.WriteLine(e);
                 }
-
-                var target = GetTarget();
-                Orbwalk(
-                    target, (_orbwalkingPoint.To2D().IsValid()) ? _orbwalkingPoint : Game.CursorPos,
-                    _config.Item("ExtraWindup").GetValue<Slider>().Value,
-                    _config.Item("HoldPosRadius").GetValue<Slider>().Value);
             }
 
             private void DrawingOnOnDraw(EventArgs args)

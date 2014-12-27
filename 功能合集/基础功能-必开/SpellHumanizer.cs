@@ -38,7 +38,7 @@ namespace LeagueSharp.Common
 
             if (slot == SpellSlot.Summoner1 || slot == SpellSlot.Summoner2)
             {
-                state = ObjectManager.Player.SummonerSpellbook.CanUseSpell(slot);
+                state = ObjectManager.Player.Spellbook.CanUseSpell(slot);
             }
             else
             {

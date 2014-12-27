@@ -94,7 +94,7 @@ namespace LeagueSharp.Common
                 new Gapcloser
                 {
                     ChampionName = "Alistar",
-                    Slot = SpellSlot.E,
+                    Slot = SpellSlot.W,
                     SpellName = "headbutt",
                     SkillType = GapcloserType.Targeted
                 });
@@ -113,8 +113,6 @@ namespace LeagueSharp.Common
                 });
 
             #endregion
-
-
 
             #region Diana
 
@@ -138,6 +136,15 @@ namespace LeagueSharp.Common
                     Slot = SpellSlot.Q,
                     SpellName = "elisespiderqcast",
                     SkillType = GapcloserType.Skillshot
+                });
+                
+            Spells.Add(
+                new Gapcloser
+                {
+                    ChampionName = "Elise",
+                    Slot = SpellSlot.E,
+                    SpellName = "elisespideredescent",
+                    SkillType = GapcloserType.Targeted
                 });
 
             #endregion
@@ -357,8 +364,21 @@ namespace LeagueSharp.Common
                 new Gapcloser
                 {
                     ChampionName = "Leona",
-                    Slot = SpellSlot.Q,
+                    Slot = SpellSlot.E,
                     SpellName = "leonazenithblade",
+                    SkillType = GapcloserType.Skillshot
+                });
+
+            #endregion
+
+            #region Lucian
+
+            Spells.Add(
+                new Gapcloser
+                {
+                    ChampionName = "Lucian",
+                    Slot = SpellSlot.E,
+                    SpellName = "luciane",
                     SkillType = GapcloserType.Skillshot
                 });
 
@@ -553,7 +573,7 @@ namespace LeagueSharp.Common
                 new Gapcloser
                 {
                     ChampionName = "Tryndamere",
-                    Slot = SpellSlot.Q,
+                    Slot = SpellSlot.E,
                     SpellName = "slashcast",
                     SkillType = GapcloserType.Skillshot
                 });
@@ -595,6 +615,32 @@ namespace LeagueSharp.Common
                     Slot = SpellSlot.E,
                     SpellName = "yasuodashwrapper",
                     SkillType = GapcloserType.Targeted
+                });
+
+            #endregion
+
+            #region Zac
+
+            Spells.Add(
+                new Gapcloser
+                {
+                    ChampionName = "Zac",
+                    Slot = SpellSlot.E,
+                    SpellName = "zace",
+                    SkillType = GapcloserType.Skillshot
+                });
+
+            #endregion
+
+            #region Ziggs
+
+            Spells.Add(
+                new Gapcloser
+                {
+                    ChampionName = "Ziggs",
+                    Slot = SpellSlot.W,
+                    SpellName = "ziggswtoggle",
+                    SkillType = GapcloserType.Skillshot
                 });
 
             #endregion
