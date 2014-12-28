@@ -1,4 +1,4 @@
-/*
+﻿/*
     Copyright (C) 2014 h3h3
 
     This program is free software: you can redistribute it and/or modify

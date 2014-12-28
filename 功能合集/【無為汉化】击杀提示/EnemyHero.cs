@@ -61,7 +61,7 @@
 //            Hero = hero;
 //            Items = new List<Items.Item>();
 //            Rotation = new List<RotationEntry>();
-//            Ignite = ObjectManager.Player.Spellbook.Spells.FirstOrDefault(x => x.Name.ToLower() == "summonerdot");
+//            Ignite = ObjectManager.Player.SummonerSpellbook.Spells.FirstOrDefault(x => x.Name.ToLower() == "summonerdot");
 
 //            Rotation.Add(new RotationEntry(SpellSlot.Unknown, DamageLib.SpellType.AD, 100));
 
