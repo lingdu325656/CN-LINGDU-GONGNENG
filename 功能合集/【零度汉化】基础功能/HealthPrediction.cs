@@ -2,7 +2,7 @@
 
 /*
  Copyright 2014 - 2014 LeagueSharp
- Orbwalking.cs is part of LeagueSharp.Common.
+ HealthPrediction.cs is part of LeagueSharp.Common.
  
  LeagueSharp.Common is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -60,6 +60,7 @@ namespace LeagueSharp.Common
 
         private static void ObjAiHeroOnOnInstantStopAttack(Obj_AI_Base sender, GameObjectInstantStopAttackEventArgs args)
         {
+            return;
             if (sender.IsValid && !new byte[] { 33, 97, 1, 225, 161, 0 }.Contains(args.BitData))
             {
                 if (ActiveAttacks.ContainsKey(sender.NetworkId))

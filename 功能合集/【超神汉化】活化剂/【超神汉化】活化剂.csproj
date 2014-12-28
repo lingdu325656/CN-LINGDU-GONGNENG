@@ -4,11 +4,11 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Release</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{064BCFE8-3251-46F8-85FF-FA1BDF83C5C9}</ProjectGuid>
+    <ProjectGuid>{B176C99F-9701-426D-8D43-9F02E1D7421C}</ProjectGuid>
     <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>BaseUlt3</RootNamespace>
-    <AssemblyName>BaseUlt3</AssemblyName>
+    <RootNamespace>MasterActivator</RootNamespace>
+    <AssemblyName>MasterActivator</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <PreBuildEvent />
@@ -35,19 +35,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="LeagueSharp, Version=1.0.0.25, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\LeagueSharp\\System\LeagueSharp.dll</HintPath>
+    <Reference Include="clipper_library">
+      <HintPath>D:\L#\LeagueSharp\\System\clipper_library.dll</HintPath>
     </Reference>
-    <Reference Include="LeagueSharp.Common, Version=1.0.0.12, Culture=neutral, processorArchitecture=x86">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\LeagueSharp\\System\LeagueSharp.Common.dll</HintPath>
+    <Reference Include="LeagueSharp">
+      <HintPath>D:\L#\LeagueSharp\\System\LeagueSharp.dll</HintPath>
+    </Reference>
+    <Reference Include="LeagueSharp.Common">
+      <HintPath>D:\L#\LeagueSharp\\System\LeagueSharp.Common.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX">
-      <HintPath>C:\LeagueSharp\\System\SharpDX.dll</HintPath>
+      <HintPath>D:\L#\LeagueSharp\\System\SharpDX.dll</HintPath>
     </Reference>
     <Reference Include="SharpDX.Direct3D9">
-      <HintPath>C:\LeagueSharp\\System\SharpDX.Direct3D9.dll</HintPath>
+      <HintPath>D:\L#\LeagueSharp\\System\SharpDX.Direct3D9.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit">
+      <HintPath>D:\L#\LeagueSharp\\System\SharpDX.Toolkit.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpDX.Toolkit.Graphics">
+      <HintPath>D:\L#\LeagueSharp\\System\SharpDX.Toolkit.Graphics.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -59,13 +66,18 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="BaseUlt.cs" />
+    <Compile Include="entity\MMinion.cs" />
+    <Compile Include="GenericDamageLib.cs" />
+    <Compile Include="MActivator.cs" />
+    <Compile Include="entity\MItem.cs" />
+    <Compile Include="enumerator\ItemTypeId.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

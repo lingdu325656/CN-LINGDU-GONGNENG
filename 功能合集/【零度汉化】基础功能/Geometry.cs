@@ -23,7 +23,7 @@
 
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using SharpDX;
 
 #endregion
@@ -75,7 +75,9 @@ namespace LeagueSharp.Common
         /// </summary>
         public static float Distance3D(this Obj_AI_Base unit, Obj_AI_Base anotherUnit, bool squared = false)
         {
-            return squared ? Vector3.DistanceSquared(unit.Position, anotherUnit.Position) :  Vector3.Distance(unit.Position, anotherUnit.Position);
+            return squared
+                ? Vector3.DistanceSquared(unit.Position, anotherUnit.Position)
+                : Vector3.Distance(unit.Position, anotherUnit.Position);
         }
 
         //Vector3 class extended methods:
@@ -99,11 +101,16 @@ namespace LeagueSharp.Common
         //Vector2 class extended methods:
 
         /// <summary>
-        /// Returns true if the Vector2 is valid.
+        /// Returns true if the vector is valid.
         /// </summary>
         public static bool IsValid(this Vector2 v)
         {
-            return (v.X != 0 && v.Y != 0);
+            return v != Vector2.Zero;
+        }
+
+        public static bool IsValid(this Vector3 v)
+        {
+            return v != Vector3.Zero;
         }
 
         /// <summary>
@@ -167,7 +174,18 @@ namespace LeagueSharp.Common
             return v;
         }
 
+        public static Vector3 Normalized(this Vector3 v)
+        {
+            v.Normalize();
+            return v;
+        }
+
         public static Vector2 Extend(this Vector2 v, Vector2 to, float distance)
+        {
+            return v + distance * (to - v).Normalized();
+        }
+
+        public static Vector3 Extend(this Vector3 v, Vector3 to, float distance)
         {
             return v + distance * (to - v).Normalized();
         }
@@ -198,10 +216,8 @@ namespace LeagueSharp.Common
         /// </summary>
         public static Vector2 Rotated(this Vector2 v, float angle)
         {
-            double c;
-            double s;
-            c = Math.Cos(angle);
-            s = Math.Sin(angle);
+            var c = Math.Cos(angle);
+            var s = Math.Sin(angle);
 
             return new Vector2((float) (v.X * c - v.Y * s), (float) (v.Y * c + v.X * s));
         }
@@ -235,12 +251,7 @@ namespace LeagueSharp.Common
                 {
                     return 90;
                 }
-                if (v1.Y < 0)
-                {
-                    return 270;
-                }
-
-                return 0;
+                return v1.Y < 0 ? 270 : 0;
             }
 
             var theta = RadianToDegree(Math.Atan((v1.Y) / v1.X));
@@ -322,8 +333,7 @@ namespace LeagueSharp.Common
             }
 
             var isOnSegment = rS.CompareTo(rL) == 0;
-            var pointSegment = new Vector2();
-            pointSegment = isOnSegment ? pointLine : new Vector2(ax + rS * (bx - ax), ay + rS * (@by - ay));
+            var pointSegment = isOnSegment ? pointLine : new Vector2(ax + rS * (bx - ax), ay + rS * (@by - ay));
             return new ProjectionInfo(isOnSegment, pointSegment, pointLine);
         }
 
@@ -446,7 +456,7 @@ namespace LeagueSharp.Common
 
                             if (!float.IsNaN(t2) && !float.IsNaN(t1))
                             {
-                                if(t1 >= delay && t2 >= delay)
+                                if (t1 >= delay && t2 >= delay)
                                     t1 = Math.Min(t1, t2);
                                 else if (t2 >= delay)
                                     t1 = t2;
@@ -481,12 +491,7 @@ namespace LeagueSharp.Common
         /// </summary>
         public static List<Vector2> To2D(this List<Vector3> path)
         {
-            var result = new List<Vector2>();
-            foreach (var point in path)
-            {
-                result.Add(point.To2D());
-            }
-            return result;
+            return path.Select(point => point.To2D()).ToList();
         }
 
 

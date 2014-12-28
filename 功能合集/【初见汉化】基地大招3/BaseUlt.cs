@@ -51,9 +51,10 @@ namespace BaseUlt3
             (Menu = new Menu("【初见汉化】基地大招3", "BaseUlt3", true)).AddToMainMenu();
             Menu.AddItem(new MenuItem("showRecalls", "显示回城").SetValue(true));
             Menu.AddItem(new MenuItem("baseUlt", "泉水大招").SetValue(true));
+            Menu.AddItem(new MenuItem("checkCollision", "碰撞检测").SetValue(true));
             Menu.AddItem(new MenuItem("panicKey", "禁用大招按键").SetValue(new KeyBind(32, KeyBindType.Press))); //32 == space
             Menu.AddItem(new MenuItem("regardlessKey", "任何时候 (保持)").SetValue(new KeyBind(17, KeyBindType.Press))); //17 == ctrl
-Menu.AddSubMenu(new Menu("初见汉化", "by chujian"));
+            Menu.AddSubMenu(new Menu("初见汉化", "by chujian"));
             Menu.SubMenu("by chujian").AddItem(new MenuItem("qunhao", "汉化群：386289593"));
             Menu.SubMenu("by chujian").AddItem(new MenuItem("qunhao1", "交流群：333399"));
             Heroes = ObjectManager.Get<Obj_AI_Hero>().ToList();
@@ -71,10 +72,10 @@ Menu.AddSubMenu(new Menu("初见汉化", "by chujian"));
                 foreach (Obj_AI_Hero champ in Allies.Where(x => !x.IsMe && IsCompatibleChamp(x.ChampionName)))
                     TeamUlt.AddItem(new MenuItem(champ.ChampionName, "Ally with baseult: " + champ.ChampionName).SetValue(false).DontSave());
 
-                DisabledChampions = Menu.AddSubMenu(new Menu("禁用大招目标", "DisabledChampions"));
+                DisabledChampions = Menu.AddSubMenu(new Menu("Disabled Champion targets", "DisabledChampions"));
 
                 foreach (Obj_AI_Hero champ in Enemies)
-                    DisabledChampions.AddItem(new MenuItem(champ.ChampionName, "不放大: " + champ.ChampionName).SetValue(false).DontSave());
+                    DisabledChampions.AddItem(new MenuItem(champ.ChampionName, "Don't shoot: " + champ.ChampionName).SetValue(false).DontSave());
             }
 
             EnemySpawnPos = ObjectManager.Get<Obj_SpawnPoint>().FirstOrDefault(x => x.IsEnemy).Position; //ObjectManager.Get<GameObject>().FirstOrDefault(x => x.Type == GameObjectType.obj_SpawnPoint && x.IsEnemy).Position;
@@ -85,7 +86,7 @@ Menu.AddSubMenu(new Menu("初见汉化", "by chujian"));
 
             Text = new Font(Drawing.Direct3DDevice, new FontDescription{FaceName = "Calibri", Height = 13, Width = 6, OutputPrecision = FontPrecision.Default, Quality = FontQuality.Default});
 
-            Game.OnGameProcessPacket += Game_OnGameProcessPacket;
+            Obj_AI_Base.OnTeleport += Obj_AI_Base_OnTeleport;
             Drawing.OnPreReset += Drawing_OnPreReset;
             Drawing.OnPostReset += Drawing_OnPostReset;
             Drawing.OnDraw += Drawing_OnDraw;
@@ -277,13 +278,13 @@ Menu.AddSubMenu(new Menu("初见汉化", "by chujian"));
             return Collision.GetCollision(new List<Vector3> { targetpos }, input).Any(); //x => x.NetworkId != targetnetid, hard to realize with teamult
         }
 
-        void Game_OnGameProcessPacket(GamePacketEventArgs args)
+        void Obj_AI_Base_OnTeleport(GameObject sender, GameObjectTeleportEventArgs args)
         {
-            if (args.PacketData[0] == Packet.S2C.Teleport.Header)
-            {
-                var recall = Packet.S2C.Teleport.Decoded(args.PacketData);
-                EnemyInfo.Find(x => x.Player.NetworkId == recall.UnitNetworkId).RecallInfo.UpdateRecall(recall); 
-            }
+            //if (args.PacketData[0] == Packet.S2C.Teleport.Header)
+            //{
+                var recall = Packet.S2C.Teleport.Decoded(sender, args);
+                EnemyInfo.Find(x => x.Player.NetworkId == recall.UnitNetworkId).RecallInfo.UpdateRecall(recall);
+            //}
         }
 
         void Drawing_OnPostReset(EventArgs args)

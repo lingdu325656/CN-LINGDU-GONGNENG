@@ -2,7 +2,7 @@
 
 /*
  Copyright 2014 - 2014 LeagueSharp
- Orbwalking.cs is part of LeagueSharp.Common.
+ Packet.cs is part of LeagueSharp.Common.
  
  LeagueSharp.Common is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -1503,7 +1503,7 @@ namespace LeagueSharp.Common
                 internal interface ITeleport
                 {
                     Type Type { get; }
-                    int GetDuration(byte[] packetData);
+                    int GetDuration(GameObjectTeleportEventArgs packetData);
                 }
 
                 internal class RecallTeleport : ITeleport
@@ -1513,10 +1513,9 @@ namespace LeagueSharp.Common
                         get { return Type.Recall; }
                     }
 
-                    public int GetDuration(byte[] packetData)
+                    public int GetDuration(GameObjectTeleportEventArgs args)
                     {
-                        var p = new GamePacket(packetData);
-                        return Utility.GetRecallTime(p.ReadString(30));
+                        return Utility.GetRecallTime(args.RecallName);
                     }
                 }
 
@@ -1527,7 +1526,7 @@ namespace LeagueSharp.Common
                         get { return Type.Teleport; }
                     }
 
-                    public int GetDuration(byte[] packetData)
+                    public int GetDuration(GameObjectTeleportEventArgs args)
                     {
                         return 3500;
                     }
@@ -1540,7 +1539,7 @@ namespace LeagueSharp.Common
                         get { return Type.TwistedFate; }
                     }
 
-                    public int GetDuration(byte[] packetData)
+                    public int GetDuration(GameObjectTeleportEventArgs args)
                     {
                         return 1500;
                     }
@@ -1553,7 +1552,7 @@ namespace LeagueSharp.Common
                         get { return Type.TwistedFate; }
                     }
 
-                    public int GetDuration(byte[] packetData)
+                    public int GetDuration(GameObjectTeleportEventArgs args)
                     {
                         return 3000;
                     }
@@ -1581,43 +1580,35 @@ namespace LeagueSharp.Common
                     return new GamePacket(Header);
                 }
 
-                public static Struct Decoded(byte[] data)
+                public static Struct Decoded(GameObject sender, GameObjectTeleportEventArgs args) //
                 {
-                    var packet = new GamePacket(data);
                     var result = new Struct
                     {
-                        UnitNetworkId = packet.ReadInteger(54),
                         Status = Status.Unknown,
                         Type = Type.Unknown
                     };
 
-                    string typeAsString = packet.ReadString(6);
-                    var gameObject = ObjectManager.GetUnitByNetworkId<GameObject>(result.UnitNetworkId);
-
-                    if (gameObject == null)
+                    if(sender == null || !sender.IsValid || !(sender is Obj_AI_Hero))
                     {
                         return result;
                     }
 
-                    var hero = gameObject as Obj_AI_Hero;
-                    if (hero == null || !hero.IsValid)
-                    {
-                        return result;
-                    }
+                    result.UnitNetworkId = sender.NetworkId;
+
+                    var hero = sender as Obj_AI_Hero;
 
                     if (!RecallDataByNetworkId.ContainsKey(result.UnitNetworkId))
                     {
                         RecallDataByNetworkId[result.UnitNetworkId] = new TeleportData {Type = Type.Unknown};
                     }
 
-
-                    if (!string.IsNullOrEmpty(typeAsString))
+                    if (!string.IsNullOrEmpty(args.RecallType))
                     {
-                        if (TypeByString.ContainsKey(typeAsString))
+                        if (TypeByString.ContainsKey(args.RecallType))
                         {
-                            ITeleport teleportMethod = TypeByString[typeAsString];
+                            ITeleport teleportMethod = TypeByString[args.RecallType];
 
-                            int duration = teleportMethod.GetDuration(data);
+                            int duration = teleportMethod.GetDuration(args);
                             Type type = teleportMethod.Type;
                             int time = Environment.TickCount;
 
@@ -1674,7 +1665,7 @@ namespace LeagueSharp.Common
 
             #endregion
 
-            #region PlayEmote - 4.21
+           #region PlayEmote - 4.21
 
             /// <summary>
             ///     Gets received when an unit uses an emote.
