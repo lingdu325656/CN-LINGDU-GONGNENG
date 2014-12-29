@@ -93,6 +93,11 @@ namespace LeagueSharp.Common
                        unitPosition.To2D()) > range * range);
         }
 
+        public static SpellDataInst GetSpell(this Obj_AI_Hero hero, SpellSlot slot)
+        {
+            return hero.Spellbook.GetSpell(slot);
+        }
+
         /// <summary>
         ///     Returns if the spell is ready to use.
         /// </summary>
@@ -100,7 +105,7 @@ namespace LeagueSharp.Common
         {
             return t == 0
                 ? spell.State == SpellState.Ready
-                : (spell.State == SpellState.Cooldown && (spell.CooldownExpires - Game.Time) <= t / 1000f);
+                : (spell.State == SpellState.Ready || (spell.State == SpellState.Cooldown && (spell.CooldownExpires - Game.Time) <= t / 1000f));
         }
 
         public static bool IsReady(this Spell spell, int t = 0)
